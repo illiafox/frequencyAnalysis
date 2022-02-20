@@ -81,8 +81,9 @@ func main() {
 		fmt.Println("Not enough arguments! Usage:\n./app input.txt output.html")
 		return
 	}
+	read, write := os.Args[1], os.Args[2]
 	// Read input file
-	data, err := ioutil.ReadFile(os.Args[1])
+	data, err := ioutil.ReadFile(read)
 	if err != nil {
 		fmt.Println("Opening file: ", err)
 		return
@@ -90,10 +91,11 @@ func main() {
 	// Lower all chars
 	input := strings.ToLower(string(data))
 	// Create map
-	counter := make(map[rune]int, len(input))
+	counter := make(map[rune]int)
 	// Print timer
 	fmt.Print(log.Prefix(), "Counting... ")
 	// Initialize time
+
 	t := time.Now()
 	// Range input
 	for _, c := range input {
@@ -104,15 +106,20 @@ func main() {
 		}
 	}
 	// Create two slices
-	str := make([]string, 0, len(counter))
-	cnt := make([]int, 0, len(counter))
+
+	str := make([]string, len(counter))
+	cnt := make([]int, len(counter))
 	// Range map
+
+	i := 0
+
 	for k, v := range counter {
-		// Append to slices above
-		str = append(str, string(k))
-		cnt = append(cnt, v)
+		str[i] = string(k)
+		cnt[i] = v
+		i++
 	}
-	// Sort slices in descending order
+
+	//	Sort slices in descending order
 	sort.Slice(cnt, func(i, j int) bool {
 		if cnt[i] > cnt[j] {
 			// Swap other slice
@@ -121,13 +128,15 @@ func main() {
 		}
 		return false
 	})
+
 	// Print timers
 	fmt.Println(time.Since(t).Seconds(), "s")
 	fmt.Print(log.Prefix(), "Drawing... ")
 	// Reinitialize time
+
 	t = time.Now()
 	// draw bar
-	err = drawBar(str, cnt, os.Args[2])
+	err = drawBar(str, cnt, write)
 	fmt.Println(time.Since(t).Seconds(), "s")
 	// Check error
 	if err != nil {
@@ -135,3 +144,4 @@ func main() {
 	}
 
 }
+
