@@ -1,4 +1,4 @@
-
+[![Go](https://github.com/illiafox/frequencyAnalysis/actions/workflows/go.yml/badge.svg)](https://github.com/illiafox/frequencyAnalysis/actions/workflows/go.yml)
 ### Frequency Analysis
 
 In cryptanalysis, frequency analysis (also known as counting letters) is the study of the frequency of letters or groups of letters in a ciphertext. The method is used as an aid to breaking classical ciphers.
