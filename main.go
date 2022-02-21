@@ -18,65 +18,60 @@ import (
 	"github.com/go-echarts/go-echarts/v2/opts"
 )
 
-// Generate Bar Items
 func generateBarItems(values []int) []opts.BarData {
-	// Create Slie
+	// Create slice
 	items := make([]opts.BarData, len(values))
-	// Range values
 	for i := range values {
-		// Set BarData with vaule
+		// Set BarData with slice values
 		items[i] = opts.BarData{Value: values[i]}
 	}
 	return items
 }
 
-// Create Bar
 func makeBar(values []int, xaxis []string) *charts.Bar {
 	// Initialize Bar
 	bar := charts.NewBar()
-	// Set Options
+	// Set its options
 	bar.SetGlobalOptions(
-		// Title
 		charts.WithTitleOpts(opts.Title{
 			Title:    "Frequency Analysis",
 			Subtitle: "",
 			Link:     "",
 			Right:    "45%",
 		}),
-		// Size
+
 		charts.WithInitializationOpts(opts.Initialization{
 			Width:  "110em",
 			Height: "50em",
 		}),
-		// X Axis
+
 		charts.WithXAxisOpts(opts.XAxis{
 			Name: "letters",
 		}),
-		// Y Axis
+
 		charts.WithYAxisOpts(opts.YAxis{
-			Name: "times occured",
+			Name: "times occurred",
 		}),
 	)
-	// Set X
 	bar.SetXAxis(xaxis).AddSeries("Category A", generateBarItems(values))
 	return bar
 }
 
-// Draw bar (write to file)
 func drawBar(str []string, cnt []int, path string) error {
 	// Create file
 	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	// Render page and return error
+	// Render page
 	return components.NewPage().
+		// Add bars
 		AddCharts(makeBar(cnt, str)).
+		// Write to file
 		Render(io.MultiWriter(f))
 }
 
 func main() {
-	// Check arguments
 	if len(os.Args) != 3 {
 		fmt.Println("Not enough arguments! Usage:\n./app input.txt output.html")
 		return
@@ -88,32 +83,29 @@ func main() {
 		fmt.Println("Opening file: ", err)
 		return
 	}
-	// Lower all chars
-	input := strings.ToLower(string(data))
-	// Create map
-	counter := make(map[rune]int)
-	// Print timer
-	fmt.Print(log.Prefix(), "Counting... ")
-	// Initialize time
 
+	input := strings.ToLower(string(data))
+	counter := make(map[rune]int)
+
+	fmt.Print(log.Prefix(), "Counting... ")
+
+	// Initialize time
 	t := time.Now()
-	// Range input
+
 	for _, c := range input {
-		// If Letter
 		if unicode.IsLetter(c) {
 			// Increment in map
 			counter[c]++
 		}
 	}
-	// Create two slices
 
+	// Create two slices, which are needed for drawBar in the end
 	str := make([]string, len(counter))
 	cnt := make([]int, len(counter))
-	// Range map
 
 	i := 0
-
 	for k, v := range counter {
+		// Set values in slices above
 		str[i] = string(k)
 		cnt[i] = v
 		i++
@@ -122,26 +114,22 @@ func main() {
 	//	Sort slices in descending order
 	sort.Slice(cnt, func(i, j int) bool {
 		if cnt[i] > cnt[j] {
-			// Swap other slice
+			// Swap second slice
 			str[i], str[j] = str[j], str[i]
 			return true
 		}
 		return false
 	})
 
-	// Print timers
 	fmt.Println(time.Since(t).Seconds(), "s")
 	fmt.Print(log.Prefix(), "Drawing... ")
-	// Reinitialize time
 
+	// Refresh time and draw bar
 	t = time.Now()
-	// draw bar
 	err = drawBar(str, cnt, write)
+
 	fmt.Println(time.Since(t).Seconds(), "s")
-	// Check error
 	if err != nil {
 		log.Println("[ERROR]", err)
 	}
-
 }
-
